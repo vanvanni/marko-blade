@@ -20,8 +20,18 @@ readonly class BladeCompilerFactory
         private ViewConfig                $viewConfig,
         private TemplateResolverInterface $resolver,
         private ?string                   $globalViewsPath = null,
+        private ?string                   $basePath = null,
     )
     {
+    }
+
+    private function resolvePath(string $path): string
+    {
+        if ($this->basePath === null || str_starts_with($path, '/') || str_starts_with($path, '\\')) {
+            return $path;
+        }
+
+        return $this->basePath . '/' . $path;
     }
 
     public function create(): Factory
@@ -30,7 +40,7 @@ readonly class BladeCompilerFactory
         $container = new Container();
         $events = new Dispatcher($container);
 
-        $cachePath = $this->viewConfig->cacheDirectory();
+        $cachePath = $this->resolvePath($this->viewConfig->cacheDirectory());
         $autoRefresh = $this->viewConfig->autoRefresh();
 
         $bladeCompiler = new BladeCompiler(
@@ -45,7 +55,8 @@ readonly class BladeCompilerFactory
         $engineResolver = new EngineResolver();
         $engineResolver->register('blade', fn() => new CompilerEngine($bladeCompiler, $filesystem));
 
-        $finder = new MarkoViewFinder($this->resolver, $this->viewConfig->extension(), $this->globalViewsPath);
+        $globalViewsPath = $this->globalViewsPath ?? ($this->basePath !== null ? $this->basePath . '/resources/views' : null);
+        $finder = new MarkoViewFinder($this->resolver, $this->viewConfig->extension(), $globalViewsPath);
 
         $factory = new Factory($engineResolver, $finder, $events);
         $factory->setContainer($container);

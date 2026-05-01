@@ -9,6 +9,17 @@ use Marko\View\ViewInterface;
 
 return [
     'bindings' => [
+        BladeCompilerFactory::class => function (ContainerInterface $container): BladeCompilerFactory {
+            $viewConfig = $container->get(\Marko\View\ViewConfig::class);
+            $resolver = $container->get(\Marko\View\TemplateResolverInterface::class);
+
+            $basePath = null;
+            if ($container->has(\Marko\Core\Path\ProjectPaths::class)) {
+                $basePath = $container->get(\Marko\Core\Path\ProjectPaths::class)->base;
+            }
+
+            return new BladeCompilerFactory($viewConfig, $resolver, null, $basePath);
+        },
         ViewInterface::class => function (ContainerInterface $container): ViewInterface {
             $factory = $container->get(BladeCompilerFactory::class)->create();
 
