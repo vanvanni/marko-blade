@@ -20,14 +20,14 @@ jobs:
           extensions: mbstring, intl
           coverage: none
 
-      - name: Check PHP version
-        run: php -v
+      - name: Validate composer.json
+        run: composer validate --strict
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress -vvv
+        run: composer install --prefer-dist --no-interaction --no-progress
 
       - name: Run tests
-        run: vendor/bin/pest --colors=never
+        run: vendor/bin/pest --colors=never --testdox
 
   create-release:
     name: Create GitHub Release

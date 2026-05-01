@@ -21,8 +21,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Marko\\View\\Blade\\Tests\\": "tests/",
-            "Marko\\": "tests/Support/Marko/"
+            "Marko\\View\\Blade\\Tests\\": "tests/"
         }
     },
     "config": {
