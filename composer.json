@@ -5,7 +5,7 @@
     "type": "library",
     "require": {
         "php": "^8.5",
-        "marko/view": "^0.3",
+        "marko/view": "^0.4",
         "illuminate/view": "^11.0 || ^12.0 || ^13.0",
         "illuminate/container": "^11.0 || ^12.0 || ^13.0",
         "illuminate/events": "^11.0 || ^12.0 || ^13.0",
