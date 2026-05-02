@@ -84,6 +84,31 @@ Because both packages use `function_exists('env')` guards, no fatal error occurs
 
 `illuminate/support` lists `vlucas/phpdotenv` as a suggested dependency, but its `Env` class cannot function without it. `marko-blade` explicitly requires `vlucas/phpdotenv` so Laravel's `env()` works correctly in any Marko project, even when the framework itself is not installed.
 
+### `@viteHeadTags` Blade Directive
+
+When `marko/vite` is installed and enabled, `marko-blade` automatically registers a `@viteHeadTags` directive:
+
+```blade
+<!DOCTYPE html>
+<html>
+<head>
+    @viteHeadTags
+    <title>My App</title>
+</head>
+<body>
+    ...
+</body>
+</html>
+```
+
+By default, it uses the entry point configured in `config/vite.php` (`vite.entry`). You can also pass a specific entry:
+
+```blade
+@viteHeadTags('app/web/resources/js/app.js')
+```
+
+In development mode (`vite.useDevServer = true`), this emits `<script type="module">` tags pointing at the Vite dev server. In production, it reads the manifest and emits hashed `<script>`, `<link rel="stylesheet">`, and `<link rel="modulepreload">` tags.
+
 ## Differences from Latte
 
 - **Strict Types**: Blade does not support `strict_types` because compiled templates are `include`d at runtime.

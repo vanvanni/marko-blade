@@ -15,6 +15,9 @@
     "require-dev": {
         "pestphp/pest": "^4.0"
     },
+    "suggest": {
+        "marko/vite": "For @viteHeadTags Blade directive support"
+    },
     "autoload": {
         "psr-4": {
             "Marko\\View\\Blade\\": "src/"

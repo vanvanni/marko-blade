@@ -18,7 +18,7 @@ return [
                 $basePath = $container->get(\Marko\Core\Path\ProjectPaths::class)->base;
             }
 
-            return new BladeCompilerFactory($viewConfig, $resolver, null, $basePath);
+            return new BladeCompilerFactory($viewConfig, $resolver, null, $basePath, $container);
         },
         ViewInterface::class => function (ContainerInterface $container): ViewInterface {
             $factory = $container->get(BladeCompilerFactory::class)->create();

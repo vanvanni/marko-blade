@@ -11,6 +11,7 @@ use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Factory;
+use Marko\Core\Container\ContainerInterface;
 use Marko\View\TemplateResolverInterface;
 use Marko\View\ViewConfig;
 
@@ -21,6 +22,7 @@ readonly class BladeCompilerFactory
         private TemplateResolverInterface $resolver,
         private ?string                   $globalViewsPath = null,
         private ?string                   $basePath = null,
+        private ?ContainerInterface       $markoContainer = null,
     )
     {
     }
@@ -38,6 +40,7 @@ readonly class BladeCompilerFactory
     {
         $filesystem = new Filesystem();
         $container = new Container();
+        Container::setInstance($container);
         $events = new Dispatcher($container);
 
         $cachePath = $this->resolvePath($this->viewConfig->cacheDirectory());
@@ -52,6 +55,8 @@ readonly class BladeCompilerFactory
             shouldCheckTimestamps: $autoRefresh,
         );
 
+        $this->registerViteDirectives($bladeCompiler, $container);
+
         $engineResolver = new EngineResolver();
         $engineResolver->register('blade', fn() => new CompilerEngine($bladeCompiler, $filesystem));
 
@@ -65,5 +70,23 @@ readonly class BladeCompilerFactory
         $container->instance(Factory::class, $factory);
 
         return $factory;
+    }
+
+    private function registerViteDirectives(BladeCompiler $compiler, Container $container): void
+    {
+        if (!class_exists(\Marko\Vite\Vite::class) || $this->markoContainer === null) {
+            return;
+        }
+
+        if (!$this->markoContainer->has(\Marko\Vite\Vite::class)) {
+            return;
+        }
+
+        $vite = $this->markoContainer->get(\Marko\Vite\Vite::class);
+        $container->instance(\Marko\Vite\Vite::class, $vite);
+
+        $compiler->directive('viteHeadTags', function ($expression) {
+            return "<?php echo \\Illuminate\\Container\\Container::getInstance()->make(\\Marko\\Vite\\Vite::class)->headTags{$expression}; ?>";
+        });
     }
 }
