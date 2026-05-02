@@ -86,7 +86,9 @@ readonly class BladeCompilerFactory
         $container->instance(\Marko\Vite\Vite::class, $vite);
 
         $compiler->directive('viteHeadTags', function ($expression) {
-            return "<?php echo \\Illuminate\\Container\\Container::getInstance()->make(\\Marko\\Vite\\Vite::class)->headTags{$expression}; ?>";
+            $args = $expression !== '' ? "({$expression})" : '()';
+
+            return "<?php echo \Illuminate\Container\Container::getInstance()->make(\Marko\Vite\Vite::class)->headTags{$args}; ?>";
         });
     }
 }
