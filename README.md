@@ -76,6 +76,14 @@ Anonymous Blade components are supported:
 <x-blog::alert type="error" :message="$message" />
 ```
 
+## Using with `marko/vite`
+
+`marko-blade` requires `illuminate/view`, which in turn requires `illuminate/support`. Both `illuminate/support` and `marko/vite` (via `marko/env`) define a global `env()` helper.
+
+Because both packages use `function_exists('env')` guards, no fatal error occurs. In practice, Laravel's `env()` typically loads first (it is a deeper dependency in Composer's graph) and is used. Both implementations are compatible for typical config usage — both coerce `'true'` → `true`, `'false'` → `false`, `'null'` → `null`, and `'empty'` → `''`.
+
+`illuminate/support` lists `vlucas/phpdotenv` as a suggested dependency, but its `Env` class cannot function without it. `marko-blade` explicitly requires `vlucas/phpdotenv` so Laravel's `env()` works correctly in any Marko project, even when the framework itself is not installed.
+
 ## Differences from Latte
 
 - **Strict Types**: Blade does not support `strict_types` because compiled templates are `include`d at runtime.
