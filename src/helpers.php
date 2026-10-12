@@ -47,3 +47,43 @@ if (!function_exists('current_url')) {
         return $scheme . '://' . $host . $uri;
     }
 }
+
+if (!function_exists('route')) {
+    /**
+     * Build the URL for a named route.
+     *
+     * @param string $name The route name.
+     * @param array<string, mixed> $parameters Route path values; unused keys become the query string.
+     * @param bool $absolute Prefix the URL with the configured base URL (routing.url).
+     *
+     * @return string The route URL.
+     */
+    function route(string $name, array $parameters = [], bool $absolute = false): string
+    {
+        return \Illuminate\Container\Container::getInstance()
+            ->make(\Marko\Routing\UrlGeneratorInterface::class)
+            ->route($name, $parameters, $absolute);
+    }
+}
+
+if (!function_exists('config')) {
+    /**
+     * Read a configuration value.
+     *
+     * @param string|null $key Dot-separated key such as 'app.name'. Null returns all configuration.
+     * @param mixed $default Returned when the key is not set.
+     *
+     * @return mixed The configuration value.
+     */
+    function config(?string $key = null, mixed $default = null): mixed
+    {
+        $config = \Illuminate\Container\Container::getInstance()
+            ->make(\Marko\Config\ConfigRepositoryInterface::class);
+
+        if ($key === null) {
+            return $config->all();
+        }
+
+        return $config->has($key) ? $config->get($key) : $default;
+    }
+}

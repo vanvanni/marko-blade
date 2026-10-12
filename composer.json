@@ -5,18 +5,20 @@
     "type": "library",
     "require": {
         "php": "^8.5",
-        "marko/view": "^0.4",
+        "marko/view": "^0.11",
         "illuminate/view": "^11.0 || ^12.0 || ^13.0",
         "illuminate/container": "^11.0 || ^12.0 || ^13.0",
         "illuminate/events": "^11.0 || ^12.0 || ^13.0",
         "illuminate/filesystem": "^11.0 || ^12.0 || ^13.0",
-        "vlucas/phpdotenv": "^5.4.1"
+        "vlucas/phpdotenv": "^5.4.1",
+        "ramsey/uuid": "^4.7"
     },
     "require-dev": {
+        "marko/vite": "^0.11",
         "pestphp/pest": "^4.0"
     },
     "suggest": {
-        "marko/vite": "For @viteHeadTags Blade directive support"
+        "marko/vite": "For the @vite and @viteHeadTags Blade directives"
     },
     "autoload": {
         "psr-4": {

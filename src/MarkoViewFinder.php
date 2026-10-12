@@ -6,6 +6,7 @@ namespace Marko\View\Blade;
 
 use Illuminate\View\ViewFinderInterface;
 use Marko\View\Exceptions\TemplateNotFoundException;
+use Marko\View\Exceptions\ViewException;
 use Marko\View\TemplateResolverInterface;
 
 readonly class MarkoViewFinder implements ViewFinderInterface
@@ -20,12 +21,12 @@ readonly class MarkoViewFinder implements ViewFinderInterface
 
     public function find($view): string
     {
-        try {
-            $template = str_replace('.', '/', $view);
+        $template = str_replace('.', '/', $view);
 
+        try {
             return $this->resolver->resolve($template);
         } catch (TemplateNotFoundException $e) {
-            if ($this->globalPath !== null) {
+            if ($this->globalPath !== null && !str_contains($template, '::') && !str_contains($template, '..')) {
                 $globalFile = $this->globalPath . '/' . $template . $this->extension;
                 if (is_file($globalFile)) {
                     return $globalFile;
@@ -34,6 +35,12 @@ readonly class MarkoViewFinder implements ViewFinderInterface
 
             throw new \InvalidArgumentException(
                 "View [{$view}] not found.",
+                0,
+                $e,
+            );
+        } catch (ViewException $e) {
+            throw new \InvalidArgumentException(
+                "View [{$view}] is invalid: {$e->getMessage()}",
                 0,
                 $e,
             );

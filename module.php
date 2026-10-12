@@ -20,6 +20,8 @@ return [
 
             return new BladeCompilerFactory($viewConfig, $resolver, null, $basePath, $container);
         },
+    ],
+    'singletons' => [
         ViewInterface::class => function (ContainerInterface $container): ViewInterface {
             $factory = $container->get(BladeCompilerFactory::class)->create();
 

@@ -4,59 +4,8 @@ declare(strict_types=1);
 
 namespace Marko\View\Blade\Tests;
 
-use Marko\Config\ConfigRepositoryInterface;
-use Marko\View\Blade\BladeCompilerFactory;
-use Marko\View\TemplateResolverInterface;
-use Marko\View\ViewConfig;
-use PHPUnit\Framework\TestCase;
-
-class BladeCompilerFactoryTest extends TestCase
+class BladeCompilerFactoryTest extends BladeTestCase
 {
-    private string $cacheDir;
-    private string $viewsDir;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->cacheDir = sys_get_temp_dir() . '/marko-blade-test-cache-' . uniqid();
-        $this->viewsDir = sys_get_temp_dir() . '/marko-blade-test-views-' . uniqid();
-
-        mkdir($this->cacheDir, 0777, true);
-        mkdir($this->viewsDir . '/resources/views/post', 0777, true);
-        mkdir($this->viewsDir . '/resources/views/layouts', 0777, true);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->recursiveDelete($this->cacheDir);
-        $this->recursiveDelete($this->viewsDir);
-
-        parent::tearDown();
-    }
-
-    private function recursiveDelete(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-
-        $files = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-
-        foreach ($files as $file) {
-            if ($file->isDir()) {
-                rmdir($file->getRealPath());
-            } else {
-                unlink($file->getRealPath());
-            }
-        }
-
-        rmdir($dir);
-    }
-
     public function testRendersSimpleBladeTemplate(): void
     {
         file_put_contents(
@@ -138,46 +87,5 @@ class BladeCompilerFactoryTest extends TestCase
         $html2 = $factory2->make('blog::post/show', ['title' => 'Second'])->render();
 
         $this->assertSame('<h2>Second</h2>', trim($html2));
-    }
-
-    private function createFactory(bool $autoRefresh = true): \Illuminate\View\Factory
-    {
-        $config = $this->createMock(ConfigRepositoryInterface::class);
-        $config->method('getString')
-            ->willReturnCallback(fn (string $key) => match ($key) {
-                'view.cache_directory' => $this->cacheDir,
-                'view.extension' => '.blade.php',
-                default => '',
-            });
-        $config->method('getBool')
-            ->willReturnCallback(fn (string $key) => match ($key) {
-                'view.auto_refresh' => $autoRefresh,
-                'view.strict_types' => false,
-                default => false,
-            });
-
-        $viewConfig = new ViewConfig($config);
-
-        $resolver = $this->createMock(TemplateResolverInterface::class);
-        $resolver->method('resolve')
-            ->willReturnCallback(function (string $template) {
-                // Strip module prefix (e.g., blog::) for test resolution
-                $pathPart = str_contains($template, '::')
-                    ? explode('::', $template, 2)[1]
-                    : $template;
-
-                $path = $this->viewsDir . '/resources/views/' . $pathPart . '.blade.php';
-                if (!file_exists($path)) {
-                    throw new \Marko\View\Exceptions\TemplateNotFoundException(
-                        "Template '{$template}' not found.",
-                    );
-                }
-
-                return $path;
-            });
-
-        $factory = new BladeCompilerFactory($viewConfig, $resolver);
-
-        return $factory->create();
     }
 }
