@@ -5,10 +5,20 @@ Blade templating engine and wanted to bring it to the Marko Framework.
 
 ## Requirements
 
-- PHP 8.5+
+- PHP 8.5.12+ (October 2026 security fixes)
 - Marko Framework 0.11 (`marko/view` ^0.11)
 
+Upgrade the PHP runtime as well as Composer dependencies. Follow
+[PHP's October 2026 advisories](https://www.php.net/archive/2026.php), including
+`session.upload_progress.enabled=0` in the host's `php.ini` until the follow-up fix
+is released. The skeleton applies this setting to both Docker targets. Library
+CI and release checks also run `composer audit`.
+
 ## Installation
+
+New sites using the self-contained Marko skeleton already include this library in
+`packages/marko-blade`. They install it locally, without a separate repository or
+Composer token. The commands below are for using the library independently.
 
 ```bash
 composer require vanvanni/marko-blade

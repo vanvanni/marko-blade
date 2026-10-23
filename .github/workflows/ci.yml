@@ -9,6 +9,9 @@ on:
     paths-ignore:
       - '**.md'
 
+permissions:
+  contents: read
+
 jobs:
   tests:
     name: Tests (PHP ${{ matrix.php }})
@@ -28,6 +31,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: mbstring, intl
+          ini-values: session.upload_progress.enabled=0
           coverage: none
 
       - name: Validate composer.json
@@ -38,3 +42,6 @@ jobs:
 
       - name: Run tests
         run: vendor/bin/pest --colors=never --testdox
+
+      - name: Audit dependencies
+        run: composer audit --locked --no-interaction

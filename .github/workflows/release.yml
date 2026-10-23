@@ -18,6 +18,7 @@ jobs:
         with:
           php-version: '8.5'
           extensions: mbstring, intl
+          ini-values: session.upload_progress.enabled=0
           coverage: none
 
       - name: Validate composer.json
@@ -28,6 +29,9 @@ jobs:
 
       - name: Run tests
         run: vendor/bin/pest --colors=never --testdox
+
+      - name: Audit dependencies
+        run: composer audit --locked --no-interaction
 
   create-release:
     name: Create GitHub Release
